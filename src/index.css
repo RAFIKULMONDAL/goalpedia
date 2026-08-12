@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    @apply bg-charcoal-900 text-gray-200 font-sans;
+    -webkit-font-smoothing: antialiased;
+  }
+  .dark body { @apply bg-charcoal-900; }
+  .light body { @apply bg-gray-100; }
+}
+
+@layer components {
+  /* Scrollbar hide utility */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Card gradient overlay */
+  .card-gradient::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #1a1a1a 0%, transparent 52%);
+    pointer-events: none;
+  }
+  .light .card-gradient::after {
+    background: linear-gradient(to top, #ffffff 0%, transparent 52%);
+  }
+
+  /* Live dot animation */
+  .live-dot {
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.18; }
+  }
+
+  /* Red underline active nav */
+  .nav-active {
+    @apply text-white border-b-2 border-red-primary;
+  }
+
+  /* Stats bar */
+  .stat-bar {
+    @apply h-0.5 rounded-full bg-red-primary;
+    transition: width 0.4s ease;
+  }
+}
