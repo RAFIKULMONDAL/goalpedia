@@ -5,11 +5,17 @@
 //        lookupteam.php is blocked
 // ─────────────────────────────────────────────────────────
 
-const BASE = 'https://www.thesportsdb.com/api/v1/json/3';
+const BASE  = 'https://www.thesportsdb.com/api/v1/json/3';
+const PROXY = 'https://corsproxy.io/?';
 
 async function apiFetch(path) {
+  // Use CORS proxy on deployed environments, direct on localhost
+  const isLocal = window.location.hostname === 'localhost';
+  const url = isLocal
+    ? `${BASE}${path}`
+    : `${PROXY}${encodeURIComponent(`${BASE}${path}`)}`;
   try {
-    const res  = await fetch(`${BASE}${path}`);
+    const res = await fetch(url);
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {

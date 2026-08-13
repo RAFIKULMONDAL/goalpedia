@@ -141,6 +141,14 @@ let syncTimer = null;
 export function initNewsAutoSync() {
   if (syncTimer) return;
 
+  // NewsAPI only works on localhost (Developer plan restriction)
+  // On deployed sites, news is read from Firestore (synced via admin panel)
+  const isLocal = window.location.hostname === 'localhost';
+  if (!isLocal) {
+    console.log('[NewsSync] Deployed environment — reading news from Firestore only. Sync from localhost admin panel.');
+    return;
+  }
+
   async function runSync() {
     const result   = await performNewsSync();
     const interval = result.skipped
