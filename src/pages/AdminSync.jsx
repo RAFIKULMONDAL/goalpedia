@@ -95,18 +95,41 @@ export default function AdminSync() {
       await clubBatch.commit();
       addLog(`✅ ${CLUBS.length} clubs seeded`, 'success');
 
-      // Seed players (deduplicated)
+      // Seed players (deduplicated) with photos from SportsDB
       const seen = new Set();
       const unique = PLAYERS.filter(p => { if(seen.has(p.name)) return false; seen.add(p.name); return true; });
+
+      addLog(`📸 Fetching photos for ${unique.length} players from SportsDB…`, 'info');
+
+      // Fetch photos in batches to avoid rate limiting
+      const withPhotos = [];
+      for (let i = 0; i < unique.length; i++) {
+        const player = unique[i];
+        try {
+          const res = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(player.name)}`);
+          const json = await res.json();
+          const raw = json?.player?.[0];
+          const photo = raw?.strThumb || raw?.strCutout || raw?.strRender || '';
+          withPhotos.push({ ...player, photo });
+        } catch {
+          withPhotos.push({ ...player, photo: '' });
+        }
+        // Small delay every 10 players to avoid rate limiting
+        if (i > 0 && i % 10 === 0) {
+          await new Promise(r => setTimeout(r, 500));
+          addLog(`  📸 ${i}/${unique.length} photos fetched…`, 'info');
+        }
+      }
+
       const playerBatch = writeBatch(db);
-      unique.forEach(player => {
+      withPhotos.forEach(player => {
         const id = slugify(player.name);
         const cleanS = { ...player.s };
         if (cleanS.r > 10) cleanS.r = parseFloat((cleanS.r/10).toFixed(1));
-        playerBatch.set(doc(db, 'players', id), { ...player, s: cleanS, firestoreId: id, photo: '', updatedAt: serverTimestamp() });
+        playerBatch.set(doc(db, 'players', id), { ...player, s: cleanS, firestoreId: id, updatedAt: serverTimestamp() });
       });
       await playerBatch.commit();
-      addLog(`✅ ${unique.length} players seeded`, 'success');
+      addLog(`✅ ${withPhotos.length} players seeded with photos`, 'success');
       addLog('🎉 Reseed complete!', 'success');
       setSummary({ players: unique.length, clubs: CLUBS.length });
     } catch (err) {

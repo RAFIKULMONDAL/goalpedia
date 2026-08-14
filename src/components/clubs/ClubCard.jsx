@@ -1,37 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
-import { searchTeam } from '../../services/sportsDbApi';
-
-const logoCache = {};
 
 export default function ClubCard({ club, trackedCount, onClick }) {
   const { dark } = useTheme();
-  const [logo,   setLogo]   = useState(club.logo || '');
+  // Use logo stored in Firestore — no live API calls on card render
   const [imgErr, setImgErr] = useState(false);
-
-  useEffect(() => {
-    // If existing logo works and isn't Wikipedia, use it
-    if (club.logo && !club.logo.includes('wikipedia') && !club.logo.includes('wikimedia')) {
-      setLogo(club.logo);
-      return;
-    }
-
-    if (logoCache[club.name]) {
-      setLogo(logoCache[club.name]);
-      return;
-    }
-
-    // Fetch from TheSportsDB
-    searchTeam(club.name).then(raw => {
-      if (raw) {
-        const url = raw.strTeamBadge || raw.strBadge || '';
-        if (url) {
-          logoCache[club.name] = url;
-          setLogo(url);
-        }
-      }
-    }).catch(() => {});
-  }, [club.name, club.logo]);
+  const logo = club.logo || '';
 
   return (
     <div

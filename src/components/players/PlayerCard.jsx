@@ -1,41 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
-import { searchPlayer } from '../../services/sportsDbApi';
-
-// Simple in-memory cache so we don't re-fetch on every render
-const photoCache = {};
 
 export default function PlayerCard({ player, onClick }) {
   const { dark } = useTheme();
-  const [photo, setPhoto] = useState(player.photo || '');
+  // Use photo stored in Firestore (seeded from admin panel)
+  // No live API calls on card render — prevents 403/429 errors on deployment
   const [imgErr, setImgErr] = useState(false);
-
+  const photo = player.photo || '';
   const ini = player.name?.split(' ').map(w => w[0]).join('').slice(0, 2) || '?';
-
-  useEffect(() => {
-    // If existing photo works don't fetch again
-    if (player.photo && !player.photo.includes('wikipedia') && !player.photo.includes('wikimedia')) {
-      setPhoto(player.photo);
-      return;
-    }
-
-    // Check cache first
-    if (photoCache[player.name]) {
-      setPhoto(photoCache[player.name]);
-      return;
-    }
-
-    // Fetch from TheSportsDB
-    searchPlayer(player.name).then(raw => {
-      if (raw) {
-        const url = raw.strThumb || raw.strCutout || raw.strRender || '';
-        if (url) {
-          photoCache[player.name] = url;
-          setPhoto(url);
-        }
-      }
-    }).catch(() => {});
-  }, [player.name, player.photo]);
 
   const rating = player.s?.r;
   const showRating = rating && rating > 0 && rating <= 10;
