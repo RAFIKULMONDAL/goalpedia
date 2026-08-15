@@ -5,44 +5,26 @@
 //        lookupteam.php is blocked
 // ─────────────────────────────────────────────────────────
 
-const BASE = 'https://www.thesportsdb.com/api/v1/json/3';
-
-const PROXIES = [
-  (url) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-  (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-];
+const BASE    = 'https://www.thesportsdb.com/api/v1/json/3';
+const IS_LOCAL = window.location.hostname === 'localhost';
 
 async function apiFetch(path) {
-  const targetUrl = `${BASE}${path}`;
-  const isLocal = window.location.hostname === 'localhost';
-
-  // On localhost call directly — no proxy needed
-  if (isLocal) {
-    try {
-      const res = await fetch(targetUrl);
+  try {
+    if (IS_LOCAL) {
+      // Direct call on localhost — no CORS issues
+      const res = await fetch(`${BASE}${path}`);
       if (!res.ok) return null;
       return await res.json();
-    } catch (err) {
-      console.warn(`[SportsDB] ${path} failed:`, err.message);
-      return null;
+    } else {
+      // Use our Vercel serverless function — no CORS issues on deployment
+      const res = await fetch(`/api/sportsdb?path=${encodeURIComponent(path)}`);
+      if (!res.ok) return null;
+      return await res.json();
     }
+  } catch (err) {
+    console.warn(`[SportsDB] ${path} failed:`, err.message);
+    return null;
   }
-
-  // On deployed — try proxies in order
-  for (const proxy of PROXIES) {
-    try {
-      const res = await fetch(proxy(targetUrl));
-      if (!res.ok) continue;
-      const data = await res.json();
-      // allorigins wraps in { contents: "..." }
-      if (data.contents) return JSON.parse(data.contents);
-      return data;
-    } catch {
-      continue;
-    }
-  }
-  console.warn(`[SportsDB] ${path} - all proxies failed`);
-  return null;
 }
 
 // ── Exact search terms per club slug ──────────────────────
