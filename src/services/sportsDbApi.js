@@ -1,9 +1,9 @@
-// ─────────────────────────────────────────────────────────
+
 //  TheSportsDB API — Free tier, no key needed
 //  Base: https://www.thesportsdb.com/api/v1/json/3
 //  Note: Only searchteams.php works on free tier (CORS)
 //        lookupteam.php is blocked
-// ─────────────────────────────────────────────────────────
+
 
 const BASE    = 'https://www.thesportsdb.com/api/v1/json/3';
 const IS_LOCAL = window.location.hostname === 'localhost';
