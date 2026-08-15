@@ -20,6 +20,9 @@ export default function PlayerProfile({ player, onBack }) {
     setLoadingExtra(true);
     setSportsDbData(null);
     setWikiData(null);
+
+    // Use photo already stored in Firestore from admin reseed
+    // SportsDB is only called for extra details (born, foot etc.) via proxy
     async function loadExtra() {
       try {
         const [sdbRaw, wiki] = await Promise.all([
@@ -28,8 +31,8 @@ export default function PlayerProfile({ player, onBack }) {
         ]);
         if (sdbRaw) {
           const formatted = formatPlayerFromSportsDB(sdbRaw);
-          const bestPhoto = sdbRaw.strThumb || sdbRaw.strCutout || sdbRaw.strRender || '';
-          console.log('[SportsDB] foot field:', sdbRaw.strFoot, '| signing:', sdbRaw.strSigning);
+          // On profile, use SportsDB photo OR photo already in Firestore
+          const bestPhoto = sdbRaw.strThumb || sdbRaw.strCutout || sdbRaw.strRender || player.photo || '';
           setSportsDbData({ ...formatted, photo: bestPhoto });
         }
         if (wiki) setWikiData(wiki);

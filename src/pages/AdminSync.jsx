@@ -165,7 +165,7 @@ export default function AdminSync() {
   }
 
   const actions = [
-    { label: '🔄 Force Reseed Players & Clubs', desc: 'Wipes ALL old data and reseeds with 44 real players + 20 clubs', fn: reseedAll, color: 'border-[#cc0000] text-[#cc0000]' },
+    { label: '🔄 Force Reseed Players & Clubs', desc: 'Wipes ALL old data and reseeds with 241 players + 35 clubs (fetches photos from SportsDB)', fn: reseedAll, color: 'border-[#cc0000] text-[#cc0000]' },
     { label: '📰 Sync News',                    desc: 'Fetch latest football news from NewsAPI (~2 requests)',          fn: syncNews,  color: 'border-purple-500 text-purple-400' },
   ];
 
