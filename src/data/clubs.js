@@ -1,11 +1,11 @@
 export const CLUBS = [
   // ── PREMIER LEAGUE ───────────────────────────────────────
   { id:'arsenal',     name:'Arsenal',              league:'Premier League',    city:'London',        mgr:'Mikel Arteta',       est:1886, trophies:14, logo:'' },
-  { id:'mancity',     name:'Man City',              league:'Premier League',    city:'Manchester',    mgr:'Pep Guardiola',      est:1880, trophies:22, logo:'' },
-  { id:'liverpool',   name:'Liverpool',             league:'Premier League',    city:'Liverpool',     mgr:'Arne Slot',          est:1892, trophies:48, logo:'' },
-  { id:'chelsea',     name:'Chelsea',               league:'Premier League',    city:'London',        mgr:'Enzo Maresca',       est:1905, trophies:33, logo:'' },
-  { id:'spurs',       name:'Tottenham',             league:'Premier League',    city:'London',        mgr:'Ange Postecoglou',   est:1882, trophies:26, logo:'' },
-  { id:'manu',        name:'Man United',            league:'Premier League',    city:'Manchester',    mgr:'Ruben Amorim',       est:1878, trophies:66, logo:'' },
+  { id:'mancity',     name:'Man City',              league:'Premier League',    city:'Manchester',    mgr:'Enzo Maresca',      est:1880, trophies:22, logo:'' },
+  { id:'liverpool',   name:'Liverpool',             league:'Premier League',    city:'Liverpool',     mgr:'Andoni Iraola',          est:1892, trophies:48, logo:'' },
+  { id:'chelsea',     name:'Chelsea',               league:'Premier League',    city:'London',        mgr:'Xabi Alanso',       est:1905, trophies:33, logo:'' },
+  { id:'spurs',       name:'Tottenham',             league:'Premier League',    city:'London',        mgr:'Roberto De Zerbi',   est:1882, trophies:26, logo:'' },
+  { id:'manu',        name:'Man United',            league:'Premier League',    city:'Manchester',    mgr:'Michal carrick',       est:1878, trophies:66, logo:'' },
   { id:'astonvilla',  name:'Aston Villa',           league:'Premier League',    city:'Birmingham',    mgr:'Unai Emery',         est:1874, trophies:7,  logo:'' },
   { id:'newcastle',   name:'Newcastle',             league:'Premier League',    city:'Newcastle',     mgr:'Eddie Howe',         est:1892, trophies:4,  logo:'' },
   { id:'everton',     name:'Everton',               league:'Premier League',    city:'Liverpool',     mgr:'Sean Dyche',         est:1878, trophies:9,  logo:'' },
@@ -28,7 +28,7 @@ export const CLUBS = [
 
   // ── SERIE A ───────────────────────────────────────────────
   { id:'inter',       name:'Inter Milan',           league:'Serie A',           city:'Milan',         mgr:'Simone Inzaghi',     est:1908, trophies:38, logo:'' },
-  { id:'acmilan',     name:'AC Milan',              league:'Serie A',           city:'Milan',         mgr:'Paulo Fonseca',      est:1899, trophies:48, logo:'' },
+  { id:'acmilan',     name:'AC Milan',              league:'Serie A',           city:'Milan',         mgr:'Ruben Amorim',      est:1899, trophies:48, logo:'' },
   { id:'juventus',    name:'Juventus',              league:'Serie A',           city:'Turin',         mgr:'Thiago Motta',       est:1897, trophies:69, logo:'' },
   { id:'atalanta',    name:'Atalanta',              league:'Serie A',           city:'Bergamo',       mgr:'Gian Piero G.',      est:1907, trophies:1,  logo:'' },
   { id:'napoli',      name:'Napoli',                league:'Serie A',           city:'Naples',        mgr:'Antonio Conte',      est:1926, trophies:4,  logo:'' },
