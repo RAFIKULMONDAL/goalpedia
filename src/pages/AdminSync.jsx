@@ -87,13 +87,48 @@ export default function AdminSync() {
         addLog(`🗑  Deleted ${existingC.size} old clubs`, 'warn');
       }
 
-      // Seed clubs
+      // Seed clubs with logos from SportsDB
+      addLog(`🏟️ Fetching logos for ${CLUBS.length} clubs…`, 'info');
+      const EXACT_TERMS = {
+        'arsenal':'Arsenal','mancity':'Manchester City','liverpool':'Liverpool',
+        'chelsea':'Chelsea','spurs':'Tottenham Hotspur','manu':'Manchester United',
+        'astonvilla':'Aston Villa','newcastle':'Newcastle United','everton':'Everton',
+        'realmadrid':'Real Madrid','barcelona':'Barcelona','atletico':'Atletico Madrid',
+        'bilbao':'Athletic Bilbao','sociedad':'Real Sociedad','sevilla':'Sevilla',
+        'bayern':'Bayern Munich','leverkusen':'Bayer Leverkusen','bvb':'Borussia Dortmund',
+        'frankfurt':'Eintracht Frankfurt','inter':'Inter Milan','acmilan':'AC Milan',
+        'juventus':'Juventus','atalanta':'Atalanta','napoli':'Napoli','roma':'AS Roma',
+        'como':'Como 1907','psg':'Paris Saint-Germain','monaco':'AS Monaco',
+        'lyon':'Lyon','marseille':'Marseille','alnassr':'Al-Nassr',
+        'intermiami':'Inter Miami CF','alittihad':'Al Ittihad','alhilal':'Al Hilal',
+        'alahli':'Al Ahli',
+      };
+
+      const clubsWithLogos = [];
+      for (const club of CLUBS) {
+        try {
+          const term = EXACT_TERMS[club.id] || club.name;
+          const res  = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(term)}`);
+          const json = await res.json();
+          const teams = (json?.teams || []).filter(t =>
+            t.strSport === 'Soccer' &&
+            !t.strTeam?.toLowerCase().includes('women') &&
+            !t.strTeam?.toLowerCase().includes('ladies')
+          );
+          const logo = teams[0]?.strTeamBadge || '';
+          clubsWithLogos.push({ ...club, logo });
+        } catch {
+          clubsWithLogos.push({ ...club, logo: '' });
+        }
+        await new Promise(r => setTimeout(r, 200));
+      }
+
       const clubBatch = writeBatch(db);
-      CLUBS.forEach(club => {
-        clubBatch.set(doc(db, 'clubs', club.id), { ...club, logo: '', updatedAt: serverTimestamp() });
+      clubsWithLogos.forEach(club => {
+        clubBatch.set(doc(db, 'clubs', club.id), { ...club, updatedAt: serverTimestamp() });
       });
       await clubBatch.commit();
-      addLog(`✅ ${CLUBS.length} clubs seeded`, 'success');
+      addLog(`✅ ${CLUBS.length} clubs seeded with logos`, 'success');
 
       // Seed players (deduplicated) with photos from SportsDB
       const seen = new Set();

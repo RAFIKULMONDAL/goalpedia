@@ -1,9 +1,9 @@
-
+// ─────────────────────────────────────────────────────────
 //  TheSportsDB API — Free tier, no key needed
 //  Base: https://www.thesportsdb.com/api/v1/json/3
 //  Note: Only searchteams.php works on free tier (CORS)
 //        lookupteam.php is blocked
-
+// ─────────────────────────────────────────────────────────
 
 const BASE    = 'https://www.thesportsdb.com/api/v1/json/3';
 const IS_LOCAL = window.location.hostname === 'localhost';
@@ -11,12 +11,13 @@ const IS_LOCAL = window.location.hostname === 'localhost';
 async function apiFetch(path) {
   try {
     if (IS_LOCAL) {
-      // Direct call on localhost — no CORS issues
-      const res = await fetch(`${BASE}${path}`);
+      // On localhost use corsproxy since TheSportsDB blocks direct browser calls
+      const url = `https://corsproxy.io/?${encodeURIComponent(`${BASE}${path}`)}`;
+      const res = await fetch(url);
       if (!res.ok) return null;
       return await res.json();
     } else {
-      // Use our Vercel serverless function — no CORS issues on deployment
+      // On Vercel use our serverless function — zero CORS issues
       const res = await fetch(`/api/sportsdb?path=${encodeURIComponent(path)}`);
       if (!res.ok) return null;
       return await res.json();
