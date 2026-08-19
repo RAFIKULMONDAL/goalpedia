@@ -3,14 +3,16 @@ import { useTheme } from '../../context/ThemeContext';
 
 export default function PlayerCard({ player, onClick }) {
   const { dark } = useTheme();
-  // Use photo stored in Firestore (seeded from admin panel)
-  // No live API calls on card render — prevents 403/429 errors on deployment
   const [imgErr, setImgErr] = useState(false);
-  const photo = player.photo || '';
-  const ini = player.name?.split(' ').map(w => w[0]).join('').slice(0, 2) || '?';
 
-  const rating = player.s?.r;
+  // Use photo stored in Firestore during admin reseed
+  // No live API calls — avoids all CORS issues on deployment
+  const photo = player.photo || '';
+  const ini   = player.name?.split(' ').map(w => w[0]).join('').slice(0, 2) || '?';
+
+  const rating    = player.s?.r;
   const showRating = rating && rating > 0 && rating <= 10;
+  const isGK      = player.pos === 'GK';
 
   return (
     <div
@@ -27,10 +29,15 @@ export default function PlayerCard({ player, onClick }) {
             onError={() => setImgErr(true)}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl font-black text-white/10">{ini}</div>
+          <div className="w-full h-full flex items-center justify-center text-5xl font-black text-white/10">
+            {ini}
+          </div>
         )}
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: dark ? 'linear-gradient(to top, #1a1a1a 0%, transparent 52%)' : 'linear-gradient(to top, #ffffff 0%, transparent 52%)' }}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: dark
+            ? 'linear-gradient(to top, #1a1a1a 0%, transparent 52%)'
+            : 'linear-gradient(to top, #ffffff 0%, transparent 52%)' }}
         />
         <span className="absolute top-2 left-2 z-10 text-[0.5rem] font-extrabold px-1.5 py-0.5 rounded bg-[#cc0000] text-white uppercase tracking-wide">
           {player.pos}
@@ -47,13 +54,15 @@ export default function PlayerCard({ player, onClick }) {
 
       {/* Body */}
       <div className="px-3 py-3">
-        <p className={`text-[0.85rem] font-bold uppercase tracking-tight truncate mb-0.5 ${dark ? 'text-white' : 'text-gray-900'}`}>{player.name}</p>
+        <p className={`text-[0.85rem] font-bold uppercase tracking-tight truncate mb-0.5 ${dark ? 'text-white' : 'text-gray-900'}`}>
+          {player.name}
+        </p>
         <p className={`text-[0.6rem] font-medium uppercase tracking-wider mb-2.5 ${dark ? 'text-gray-500' : 'text-gray-400'}`}>
           {player.flag} {player.club}
         </p>
 
         <div className="grid grid-cols-3 gap-1 mb-2.5">
-          {(player.pos === 'GK'
+          {(isGK
             ? [['Clean Sheets', player.s?.cs ?? 0], ['Saves', player.s?.sv ?? 0], ['Apps', player.s?.ap ?? 0]]
             : [['Goals', player.s?.g ?? 0], ['Assists', player.s?.a ?? 0], ['Apps', player.s?.ap ?? 0]]
           ).map(([label, val]) => (

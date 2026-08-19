@@ -3,8 +3,10 @@ import { useTheme } from '../../context/ThemeContext';
 
 export default function ClubCard({ club, trackedCount, onClick }) {
   const { dark } = useTheme();
-  // Use logo stored in Firestore — no live API calls on card render
   const [imgErr, setImgErr] = useState(false);
+
+  // Use logo stored in Firestore during admin reseed
+  // No live API calls — avoids all CORS issues
   const logo = club.logo || '';
 
   return (
@@ -12,12 +14,18 @@ export default function ClubCard({ club, trackedCount, onClick }) {
       onClick={() => onClick(club)}
       className={`rounded-xl p-4 flex flex-col items-center text-center cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${dark ? 'bg-[#1a1a1a]' : 'bg-white'}`}
     >
-      {/* Logo */}
       <div className={`w-14 h-14 rounded-full flex items-center justify-center overflow-hidden mb-2 flex-shrink-0 ${dark ? 'bg-[#2a2a2a]' : 'bg-gray-100'}`}>
         {logo && !imgErr ? (
-          <img src={logo} alt={club.name} className="w-full h-full object-contain p-1.5" onError={() => setImgErr(true)} />
+          <img
+            src={logo}
+            alt={club.name}
+            className="w-full h-full object-contain p-1.5"
+            onError={() => setImgErr(true)}
+          />
         ) : (
-          <span className="text-2xl font-black text-[#cc0000]">{club.name?.slice(0, 2).toUpperCase()}</span>
+          <span className="text-2xl font-black text-[#cc0000]">
+            {club.name?.slice(0, 2).toUpperCase()}
+          </span>
         )}
       </div>
 
@@ -26,7 +34,11 @@ export default function ClubCard({ club, trackedCount, onClick }) {
       <p className={`text-[0.56rem] font-semibold uppercase tracking-wide leading-relaxed ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
         {club.city}{club.est ? ` · Est. ${club.est}` : ''}
       </p>
-      {club.mgr && <p className={`text-[0.56rem] font-semibold uppercase tracking-wide ${dark ? 'text-gray-400' : 'text-gray-500'}`}>Mgr: {club.mgr}</p>}
+      {club.mgr && (
+        <p className={`text-[0.56rem] font-semibold uppercase tracking-wide ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
+          Mgr: {club.mgr}
+        </p>
+      )}
 
       <div className={`flex gap-3 mt-2 pt-2 border-t w-full ${dark ? 'border-white/[0.06]' : 'border-black/[0.06]'}`}>
         <div className="flex-1 text-center">
