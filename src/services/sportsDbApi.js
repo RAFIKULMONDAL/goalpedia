@@ -5,23 +5,15 @@
 //        lookupteam.php is blocked
 // ─────────────────────────────────────────────────────────
 
-const BASE    = 'https://www.thesportsdb.com/api/v1/json/3';
-const IS_LOCAL = window.location.hostname === 'localhost';
+const BASE = 'https://www.thesportsdb.com/api/v1/json/3';
 
 async function apiFetch(path) {
   try {
-    if (IS_LOCAL) {
-      // On localhost use corsproxy since TheSportsDB blocks direct browser calls
-      const url = `https://corsproxy.io/?${encodeURIComponent(`${BASE}${path}`)}`;
-      const res = await fetch(url);
-      if (!res.ok) return null;
-      return await res.json();
-    } else {
-      // On Vercel use our serverless function — zero CORS issues
-      const res = await fetch(`/api/sportsdb?path=${encodeURIComponent(path)}`);
-      if (!res.ok) return null;
-      return await res.json();
-    }
+    const serverlessRes = await fetch(`/api/sportsdb?path=${encodeURIComponent(path)}`);
+    if (serverlessRes.ok) return await serverlessRes.json();
+    const directRes = await fetch(`${BASE}${path}`);
+    if (!directRes.ok) return null;
+    return await directRes.json();
   } catch (err) {
     console.warn(`[SportsDB] ${path} failed:`, err.message);
     return null;
