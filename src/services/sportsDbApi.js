@@ -54,7 +54,10 @@ const EXACT_SEARCH_TERMS = {
 };
 
 // ── Search team by name ───────────────────────────────────
-export async function searchTeam(name) {
+export async function searchTeam(name, clubId = null) {
+  // Use exact search term for this club if available
+  const exactTerm = clubId && EXACT_SEARCH_TERMS[clubId] ? EXACT_SEARCH_TERMS[clubId] : name;
+  name = exactTerm;
   const json  = await apiFetch(`/searchteams.php?t=${encodeURIComponent(name)}`);
   const teams = json?.teams || [];
   if (!teams.length) return null;

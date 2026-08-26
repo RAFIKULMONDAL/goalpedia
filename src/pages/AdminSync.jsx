@@ -6,6 +6,7 @@ import { db } from '../firebase/config';
 import { collection, doc, writeBatch, getDocs, serverTimestamp } from 'firebase/firestore';
 import { PLAYERS } from '../data/players';
 import { CLUBS }   from '../data/clubs';
+import { searchPlayer, searchTeam } from '../services/sportsDbApi';
 import { fetchFootballNews, fetchTransferNews } from '../services/newsApi';
 import { performNewsSync } from '../services/newsAutoSync';
 
@@ -89,38 +90,19 @@ export default function AdminSync() {
 
       // Seed clubs with logos from SportsDB
       addLog(`🏟️ Fetching logos for ${CLUBS.length} clubs…`, 'info');
-      const EXACT_TERMS = {
-        'arsenal':'Arsenal','mancity':'Manchester City','liverpool':'Liverpool',
-        'chelsea':'Chelsea','spurs':'Tottenham Hotspur','manu':'Manchester United',
-        'astonvilla':'Aston Villa','newcastle':'Newcastle United','everton':'Everton',
-        'realmadrid':'Real Madrid','barcelona':'Barcelona','atletico':'Atletico Madrid',
-        'bilbao':'Athletic Bilbao','sociedad':'Real Sociedad','sevilla':'Sevilla',
-        'bayern':'Bayern Munich','leverkusen':'Bayer Leverkusen','bvb':'Borussia Dortmund',
-        'frankfurt':'Eintracht Frankfurt','inter':'Inter Milan','acmilan':'AC Milan',
-        'juventus':'Juventus','atalanta':'Atalanta','napoli':'Napoli','roma':'AS Roma',
-        'como':'Como 1907','psg':'Paris Saint-Germain','monaco':'AS Monaco',
-        'lyon':'Lyon','marseille':'Marseille','alnassr':'Al-Nassr',
-        'intermiami':'Inter Miami CF','alittihad':'Al Ittihad','alhilal':'Al Hilal',
-        'alahli':'Al Ahli',
-      };
-
       const clubsWithLogos = [];
-      for (const club of CLUBS) {
+      for (let i = 0; i < CLUBS.length; i++) {
+        const club = CLUBS[i];
         try {
-          const term = EXACT_TERMS[club.id] || club.name;
-          const res  = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(term)}`);
-          const json = await res.json();
-          const teams = (json?.teams || []).filter(t =>
-            t.strSport === 'Soccer' &&
-            !t.strTeam?.toLowerCase().includes('women') &&
-            !t.strTeam?.toLowerCase().includes('ladies')
-          );
-          const logo = teams[0]?.strTeamBadge || '';
+          // Use sportsDbApi service — handles proxy/serverless automatically
+          const raw  = await searchTeam(club.name, club.id);
+          const logo = raw?.strTeamBadge || raw?.strBadge || '';
           clubsWithLogos.push({ ...club, logo });
+          if (i % 5 === 0) addLog(`  🏟️ ${i+1}/${CLUBS.length} logos fetched…`, 'info');
         } catch {
           clubsWithLogos.push({ ...club, logo: '' });
         }
-        await new Promise(r => setTimeout(r, 200));
+        await new Promise(r => setTimeout(r, 300));
       }
 
       const clubBatch = writeBatch(db);
@@ -141,17 +123,15 @@ export default function AdminSync() {
       for (let i = 0; i < unique.length; i++) {
         const player = unique[i];
         try {
-          const res = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(player.name)}`);
-          const json = await res.json();
-          const raw = json?.player?.[0];
+          // Use sportsDbApi service — handles proxy/serverless automatically
+          const raw   = await searchPlayer(player.name);
           const photo = raw?.strThumb || raw?.strCutout || raw?.strRender || '';
           withPhotos.push({ ...player, photo });
         } catch {
           withPhotos.push({ ...player, photo: '' });
         }
-        // Small delay every 10 players to avoid rate limiting
         if (i > 0 && i % 10 === 0) {
-          await new Promise(r => setTimeout(r, 500));
+          await new Promise(r => setTimeout(r, 300));
           addLog(`  📸 ${i}/${unique.length} photos fetched…`, 'info');
         }
       }

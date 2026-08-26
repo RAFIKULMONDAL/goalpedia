@@ -905,7 +905,7 @@ export const PLAYERS = [
     status:{fit:"100%",fc:"g",inj:"None",con:"2026",val:"£8M"},
     s:{g:0,a:0,ap:28,r:7.2,sh:0,ch:0,dr:0,xG:0,m:2520,yc:1,rc:0,pa:68,sv:88,cs:9,gc:34},
     perf:{Reflexes:80,Positioning:78,Distribution:72,Command:76,"Shot Stopping":80,Claiming:70} },
-  { name:"Omar Marmoush", num:7, flag:"🇪🇬", club:"Eintracht Frankfurt", cid:"frankfurt", pos:"FW", age:25, nat:"Egypt", cap:false, photo:"", foot:"Right",
+  { name:"Omar Marmoush", num:7, flag:"🇪🇬", club:"Tottenham", cid:"spurs", pos:"FW", age:25, nat:"Egypt", cap:false, photo:"", foot:"Right",
     status:{fit:"100%",fc:"g",inj:"None",con:"2027",val:"£35M"},
     s:{g:18,a:12,ap:30,r:7.8,sh:78,ch:52,dr:88,xG:14.8,m:2340,yc:2,rc:0,pa:72},
     perf:{Finishing:80,Dribbling:82,Pace:84,Passing:72,"Aerial Duels":62,Pressing:76} },
