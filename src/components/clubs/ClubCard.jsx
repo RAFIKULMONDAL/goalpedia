@@ -1,13 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../context/ThemeContext';
+
+const logoCache = {};
 
 export default function ClubCard({ club, trackedCount, onClick }) {
   const { dark } = useTheme();
+  const [logo,   setLogo]   = useState(club.logo || '');
   const [imgErr, setImgErr] = useState(false);
 
-  // Use logo stored in Firestore during admin reseed
-  // No live API calls — avoids all CORS issues
-  const logo = club.logo || '';
+  useEffect(() => {
+    // If Firestore has a logo use it
+    if (club.logo && club.logo.startsWith('http')) {
+      setLogo(club.logo);
+      return;
+    }
+    // Check cache
+    if (logoCache[club.id]) {
+      setLogo(logoCache[club.id]);
+      return;
+    }
+    // Fetch via serverless function (works on both localhost and Vercel)
+    fetch(`/api/sportsdb?path=${encodeURIComponent(`/searchteams.php?t=${encodeURIComponent(club.name)}`)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(json => {
+        const teams = (json?.teams || []).filter(t =>
+          t.strSport === 'Soccer' &&
+          !t.strTeam?.toLowerCase().includes('women') &&
+          !t.strTeam?.toLowerCase().includes('ladies')
+        );
+        const url = teams[0]?.strTeamBadge || '';
+        if (url) { logoCache[club.id] = url; setLogo(url); }
+      })
+      .catch(() => {});
+  }, [club.id, club.name, club.logo]);
 
   return (
     <div
@@ -16,38 +41,26 @@ export default function ClubCard({ club, trackedCount, onClick }) {
     >
       <div className={`w-14 h-14 rounded-full flex items-center justify-center overflow-hidden mb-2 flex-shrink-0 ${dark ? 'bg-[#2a2a2a]' : 'bg-gray-100'}`}>
         {logo && !imgErr ? (
-          <img
-            src={logo}
-            alt={club.name}
-            className="w-full h-full object-contain p-1.5"
-            onError={() => setImgErr(true)}
-          />
+          <img src={logo} alt={club.name} className="w-full h-full object-contain p-1.5"
+            onError={() => setImgErr(true)} />
         ) : (
-          <span className="text-2xl font-black text-[#cc0000]">
-            {club.name?.slice(0, 2).toUpperCase()}
-          </span>
+          <span className="text-2xl font-black text-[#cc0000]">{club.name?.slice(0,2).toUpperCase()}</span>
         )}
       </div>
-
-      <p className={`text-[0.82rem] font-extrabold uppercase tracking-tight mb-0.5 ${dark ? 'text-white' : 'text-gray-900'}`}>{club.name}</p>
+      <p className={`text-[0.82rem] font-extrabold uppercase tracking-tight mb-0.5 ${dark?'text-white':'text-gray-900'}`}>{club.name}</p>
       <p className="text-[0.56rem] font-bold text-[#cc0000] uppercase tracking-widest mb-1">{club.league}</p>
-      <p className={`text-[0.56rem] font-semibold uppercase tracking-wide leading-relaxed ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
+      <p className={`text-[0.56rem] font-semibold uppercase tracking-wide leading-relaxed ${dark?'text-gray-400':'text-gray-500'}`}>
         {club.city}{club.est ? ` · Est. ${club.est}` : ''}
       </p>
-      {club.mgr && (
-        <p className={`text-[0.56rem] font-semibold uppercase tracking-wide ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
-          Mgr: {club.mgr}
-        </p>
-      )}
-
-      <div className={`flex gap-3 mt-2 pt-2 border-t w-full ${dark ? 'border-white/[0.06]' : 'border-black/[0.06]'}`}>
+      {club.mgr && <p className={`text-[0.56rem] font-semibold uppercase tracking-wide ${dark?'text-gray-400':'text-gray-500'}`}>Mgr: {club.mgr}</p>}
+      <div className={`flex gap-3 mt-2 pt-2 border-t w-full ${dark?'border-white/[0.06]':'border-black/[0.06]'}`}>
         <div className="flex-1 text-center">
-          <span className={`block font-mono text-[0.8rem] font-bold ${dark ? 'text-white' : 'text-gray-900'}`}>{trackedCount}</span>
-          <span className={`block text-[0.44rem] font-bold uppercase tracking-wider mt-0.5 ${dark ? 'text-gray-500' : 'text-gray-400'}`}>Players</span>
+          <span className={`block font-mono text-[0.8rem] font-bold ${dark?'text-white':'text-gray-900'}`}>{trackedCount}</span>
+          <span className={`block text-[0.44rem] font-bold uppercase tracking-wider mt-0.5 ${dark?'text-gray-500':'text-gray-400'}`}>Players</span>
         </div>
         <div className="flex-1 text-center">
-          <span className={`block font-mono text-[0.8rem] font-bold ${dark ? 'text-white' : 'text-gray-900'}`}>{club.trophies || '—'}</span>
-          <span className={`block text-[0.44rem] font-bold uppercase tracking-wider mt-0.5 ${dark ? 'text-gray-500' : 'text-gray-400'}`}>Trophies</span>
+          <span className={`block font-mono text-[0.8rem] font-bold ${dark?'text-white':'text-gray-900'}`}>{club.trophies||'—'}</span>
+          <span className={`block text-[0.44rem] font-bold uppercase tracking-wider mt-0.5 ${dark?'text-gray-500':'text-gray-400'}`}>Trophies</span>
         </div>
       </div>
     </div>
