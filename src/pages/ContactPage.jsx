@@ -113,7 +113,7 @@ export default function ContactPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                 <div>
                   <label className={labelCls}>Your Name *</label>
-                  <input className={inputCls} placeholder="John Doe" value={form.name} onChange={e => handleChange('name', e.target.value)} />
+                  <input className={inputCls} placeholder="Enter name" value={form.name} onChange={e => handleChange('name', e.target.value)} />
                   {errors.name && <p className="text-[0.58rem] text-red-400 mt-1">{errors.name}</p>}
                 </div>
                 <div>
