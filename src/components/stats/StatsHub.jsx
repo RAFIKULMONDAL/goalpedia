@@ -104,7 +104,7 @@ export default function StatsHub({ onPlayerClick }) {
             <div className={`rounded-xl overflow-hidden ${bg1}`}>
               <div className="flex items-center justify-between px-4 py-3 bg-[#cc0000]">
                 <span className="text-[0.65rem] font-extrabold text-white uppercase tracking-widest">Top Scorers</span>
-                <span className="text-[0.55rem] font-bold text-white/70 uppercase">{activeLeague} · 2025/26</span>
+                <span className="text-[0.55rem] font-bold text-white/70 uppercase">{activeLeague} · 2026/27</span>
               </div>
               {scorers.length > 0 ? scorers.map((p, i) => (
                 <div key={i} className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 ${dark ? 'border-white/[0.04]' : 'border-black/[0.04]'}`}>
