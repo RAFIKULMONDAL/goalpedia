@@ -124,7 +124,7 @@ export default function ContactPage() {
             <label className={`block text-[0.6rem] font-bold uppercase tracking-widest mb-1.5 ${t3}`}>Your Name *</label>
             <input
               type="text"
-              placeholder="Rafik Mondal"
+              placeholder="Your Name"
               value={form.name}
               onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
               className={inp}
