@@ -81,11 +81,11 @@ export default function Footer() {
       {/* Bottom */}
       <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-white/[0.07] max-w-6xl mx-auto">
         <p className="text-[0.54rem] font-semibold text-gray-600 uppercase tracking-wide">
-          © 2025 Goalpedia · Season 2024/25
+          © 2026 Goalpedia · Season 2026/27
         </p>
         <div className="flex items-center gap-1.5 font-mono text-[0.52rem] text-gray-600">
           <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
-          v1.0 · live
+           live
         </div>
       </div>
     </footer>
